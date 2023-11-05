@@ -151,4 +151,111 @@ int main() {
 
 C++ 对定义于不同编译单元内的 non-local static 对象的初始化次序并无明确定义。
 
-为免除“跨编译单元之初始化次序”问题，应以 local static 对象替换 non-local static 对象。98
+为免除“跨编译单元之初始化次序”问题，应以 local static 对象替换 non-local static 对象。
+
+## 条款05: 了解 C++ 默默编写并调用哪些函数
+
+C++拒绝为持有reference或const成员的类自动生成拷贝赋值运算符。
+
+若基类将拷贝赋值运算符声明为 private，则编译器将拒绝为派生类生成拷贝赋值运算符。
+
+## 条款06: 若不想使用编译器自动生成的函数，就该明确拒绝
+
+```cpp
+class App {
+    App(const App&) = delete;
+    App& operator=(const App&) = delete;
+};
+```
+
+## 条款07: 为多态基类声明 virtual 析构函数
+
+如果class带有任何virtual函数，那么它就该拥有一个virtual析构函数。
+
+如果一个class不会被用作基类，就不要令其析构函数为virtual，因为这样class还要多保存一个指向虚函数表的指针，使类对象的体积增加。
+
+不要继承标准容器或其他任何带有非virtual析构函数的class。
+
+必须为纯虚析构函数提供定义。析构函数的运作方式是，最深层派生的那个class的析构函数最先被调用，然后是每一个base class的析构函数被调用，所以即使析构函数是纯虚函数，也必须为这个函数提供一个定义。如果不这样做，链接器会报错。
+
+```cpp
+class App {
+public:
+    int x, y;
+    virtual ~App() = 0;
+};
+
+// App::~App() {} 必须为纯虚析构函数提供定义，否则报错
+
+class App2 : public App {
+public:
+    virtual ~App2() {}
+};
+
+int main() {
+    App2 app2{};
+
+    return 0;
+}
+```
+
+## 条款08: 别让异常逃离析构函数
+
+析构函数绝对不要抛出异常。如果一个被析构函数调用的函数可能抛出异常，析构函数应该捕获任何异常，然后吞下它们（不传播）或结束程序：
+
+- 抛出异常就结束程序。
+```cpp
+class DBConn {
+public:
+    ...
+    ~DBConn();
+private:
+    DBConnection db;
+};
+
+DBConn::~DBconn() {
+    try { db.close(); }
+    catch(...) {
+        // ...
+        // 记录下对close的调用失败
+        std::abort();
+    }
+}
+```
+
+- 吞下异常。
+```cpp
+DBConn::~DBconn() {
+    try { db.close(); }
+    catch(...) {
+        // ...
+        // 记录下对close的调用失败
+    }
+}
+```
+
+如果客户需要对某个操作函数运行期间抛出的异常作出反应，那么class应该提供一个普通函数（而非在析构函数中）执行该操作:
+
+```cpp
+class DBConn {
+public:
+    ...
+    void close() {  // 供客户使用的新函数
+        db.close();
+        closed = true;
+    }
+
+    ~DBConn() {
+        if (!closed) {  // 若客户没有自行关闭，则关闭连接
+            try { db.close(); }
+        }
+        catch (...) {
+            // 记录下对close的调用失败
+        }
+    }
+private:
+    DBConnection db;
+    bool closed;
+};
+```
+

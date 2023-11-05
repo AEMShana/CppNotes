@@ -10,11 +10,15 @@ n 本 C++ 书籍的读书笔记。
 
 ## Modern Effective C++ (已读完，待施工)
 
-## Effective C++ (施工中[4/55])
+## Effective C++ (施工中[8/55])
 - [条款01: 视C++为一个语言联邦](EffectiveCpp/EffectiveCpp.md)
 - [条款02: 尽量以 const, enum, inline 替换 #define](EffectiveCpp/EffectiveCpp.md)
 - [条款03: 尽可能使用 const](EffectiveCpp/EffectiveCpp.md)
 - [条款04: 确定对象被使用前已被初始化](EffectiveCpp/EffectiveCpp.md)
+- [条款05: 了解 C++ 默默编写并调用哪些函数](EffectiveCpp/EffectiveCpp.md)
+- [条款06: 若不想使用编译器自动生成的函数，就该明确拒绝](EffectiveCpp/EffectiveCpp.md)
+- [条款07: 为多态基类声明 virtual 析构函数](EffectiveCpp/EffectiveCpp.md)
+- [条款08: 别让异常逃离析构函数](EffectiveCpp/EffectiveCpp.md)
 
 
 ## More Effective C++ (待读)
