@@ -259,3 +259,120 @@ private:
 };
 ```
 
+## 条款09: 绝不在构造和析构过程中调用 virtual 函数
+
+在基类构造期间，virtual 函数绝不会下降到派生类层次，此时的 virtual 函数仿佛不是 virtual 函数：
+
+```cpp
+#include <iostream>
+
+class A {
+public:
+    A() { func(); }
+
+    virtual void func() { std::cout << "A::func()" << std::endl; }
+};
+
+class B : public A {
+public:
+    virtual void func() override { std::cout << "B::func()" << std::endl; }
+};
+
+int main() {
+    B b{}; // 输出: A::func()
+
+    return 0;
+}
+```
+
+## 条款10: 令 operator= 返回一个 reference to *this
+
+为了支持连锁赋值:
+```cpp
+int x, y, z;
+x = y = z = 15;
+// 等价于 x = (y = (z = 15));
+```
+
+赋值运算符必须返回一个 reference 指向操作符的左侧实参：
+```cpp
+class Widget {
+public:
+    Widget& operator=(const Widget& rhs) {
+        return *this;
+    }
+};
+```
+
+## 条款11: 在 operator= 中处理自我赋值
+
+自我赋值可能的出现情况：
+```cpp
+class Widget{...};
+Widget w;
+...
+w = w;          // 赋值给自己
+a[i] = a[j];    // 潜在的自我赋值
+*px = *py;      // 潜在的自我赋值
+
+class Base;
+class Derived : public Base;
+
+void do_something(const Base& rb, Derived* pd); // rb 和 pd 可能是同一对象
+```
+
+处理自我赋值一般有以下几种解决方案：
+- 证同测试
+```cpp
+Widget& Widget::operator=(const Widget& rhs) {
+    if (this == &rhs) return *this;  // 证同测试，如果是自我赋值，则不做任何事
+    delete pb;
+    pb = new Bitmap(*rhs.pb);
+    return *this;
+}
+```
+- 精心考虑语句顺序，让 operator= 具备异常安全性往往自动获得自我赋值安全的回报
+```cpp
+Widget& Widget::operator=(const Widget& rhs) {
+    Bitmap* pOrig = pb;
+    pb = new Bitmap(*rhs.pb);
+    delete pOrig;
+    return *this;
+}
+```
+
+- 使用 copy and swap 技术
+```cpp
+void swap(Widget& rhs);
+
+Widget& Widget::operator=(const Widget& rhs) {
+    Widget temp{rhs};
+    swap(temp);
+    return *this;
+}
+```
+
+## 条款12: 复制对象时勿忘其每一个成分
+
+copying 函数应该确保复制对象内的所有成员变量及所有基类部分。对于派生类的基类部分，应该让派生类的 copying 函数调用相应的基类函数：
+
+```cpp
+class A {
+public:
+    ...
+    A(const A& rhs) {...}
+    A& operator=(const A& rhs) {...}
+};
+
+class B : public A {
+public:
+    ...
+    B(const B& rhs) : A(rhs) {...}
+    B& operator=(const B& rhs) {
+        A::operator=(rhs);
+        ...
+    }
+};
+```
+
+不要尝试以某个 copying 函数实现另一个 copying 函数（如令拷贝构造函数调用赋值运算符，或令赋值运算符调用拷贝构造函数）。应该将共同机能放进第三个函数中，并由两个 copying 函数共同调用。
