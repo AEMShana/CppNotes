@@ -376,3 +376,56 @@ public:
 ```
 
 不要尝试以某个 copying 函数实现另一个 copying 函数（如令拷贝构造函数调用赋值运算符，或令赋值运算符调用拷贝构造函数）。应该将共同机能放进第三个函数中，并由两个 copying 函数共同调用。
+
+## 条款13: 以对象管理资源
+
+为防止资源泄漏，请使用RAII对象，它们在构造函数中获得资源，并在析构函数中释放资源。
+
+## 条款14：在资源管理类中小心 copying 行为
+
+注意考虑RAII类的复制行为，是需要禁止复制，还是使用引用计数，还是进行深\浅拷贝，还是转移资源的所有权。
+
+## 条款15: 在资源管理类中提供对原始资源的访问
+
+API 往往要求访问原始资源(raw resources)，所以每一个RAII class应该提供一个取得其所管理之资源的办法。
+
+对原始资源的访问可能经由显式转换或隐式转换。一般而言显式转换比较安全，但隐式转换对客户比较方便。因此需要根据具体情况进行取舍。
+
+## 条款16: 成对使用 new 和 delete 时要采取相同形式
+
+```cpp
+int* x = new int{};
+delete x;
+
+int* y = new int[5] {};
+delete[] y;
+```
+
+## 条款17: 以独立语句将 newed 对象置入智能指针
+
+```cpp
+int priority();
+void processWidget(std::shared_ptr<Widget> pw, int priority);
+
+processWidget(std::shared_ptr<Widget>(new Widget), priority()); // 可能出现内存泄漏！
+```
+
+在调用 `processWidget` 前，需要执行以下3个步骤：
+- `new Widget`
+- 调用 `std::shared_ptr<Widget>` 的构造函数
+- 调用 `priority`
+
+`new Widget` 保证在调用 `std::shared_ptr<Widget>` 的构造函数前被执行，然而 C++ 并没有规定 `priority` 的执行顺序，`priority` 在`new Widget`语句之前、`new Widget` 之后、最后执行都有可能。
+
+如果调用顺序是: 
+- `new Widget`
+- 调用 `priority`
+- 调用 `std::shared_ptr<Widget>` 的构造函数
+
+并且调用 `priority` 时抛出异常，那么 `new Widget` 返回的指针会遗失，造成内存泄漏。
+
+因此以上代码应该改成:
+```cpp
+std::shared_ptr<Widget> pw(new Widget); // 以独立语句将 newed 对象置入智能指针
+processWidget(pw, priority());
+```
