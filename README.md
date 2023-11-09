@@ -10,7 +10,7 @@ n 本 C++ 书籍的读书笔记。
 
 ## Modern Effective C++ (已读完，待施工)
 
-## Effective C++ (施工中[17/55])
+## Effective C++ (施工中[20/55])
 - [条款01: 视C++为一个语言联邦](EffectiveCpp/EffectiveCpp.md)
 - [条款02: 尽量以 const, enum, inline 替换 #define](EffectiveCpp/EffectiveCpp.md)
 - [条款03: 尽可能使用 const](EffectiveCpp/EffectiveCpp.md)
@@ -28,6 +28,9 @@ n 本 C++ 书籍的读书笔记。
 - [条款15: 在资源管理类中提供对原始资源的访问](EffectiveCpp/EffectiveCpp.md)
 - [条款16: 成对使用 new 和 delete 时要采取相同形式](EffectiveCpp/EffectiveCpp.md)
 - [条款17: 以独立语句将 newed 对象置入智能指针](EffectiveCpp/EffectiveCpp.md) 
+- [条款18: 让接口容易被正确使用，不易被误用](EffectiveCpp/EffectiveCpp.md)
+- [条款19: 设计 class 犹如设计 type](EffectiveCpp/EffectiveCpp.md)
+- [条款20: 宁以 pass-by-reference-to-const 替换 pass-by-value](EffectiveCpp/EffectiveCpp.md) 
 
 ## More Effective C++ (待读)
 

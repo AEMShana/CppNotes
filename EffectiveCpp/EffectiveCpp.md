@@ -429,3 +429,42 @@ processWidget(std::shared_ptr<Widget>(new Widget), priority()); // 可能出现�
 std::shared_ptr<Widget> pw(new Widget); // 以独立语句将 newed 对象置入智能指针
 processWidget(pw, priority());
 ```
+
+## 条款18: 让接口容易被正确使用，不易被误用
+
+“促进正确使用”的办法包括接口的一致性，以及与内置类型的行为兼容。
+
+“阻止误用”的办法包括建立新类型、限制类型上的操作，束缚对象值，以及消除客户的资源管理责任。
+
+## 条款19: 设计 class 犹如设计 type
+
+略。
+
+## 条款20: 宁以 pass-by-reference-to-const 替换 pass-by-value
+
+尽量以 pass-by-reference-to-const 替换 pass-by-value，前者通常比较高效，并可避免切割问题：
+
+```cpp
+class Window {
+public:
+    ...
+    std::string name() const;
+    virtual void display() const;
+};
+
+class WindowWithScrollBars: public Window {
+public:
+    ...
+    virtual void display() const;
+};
+
+void printNameAndDisplay(Window w) { // pass-by-value
+    std::cout << w.name() << std::endl;
+    w.display();
+}
+
+WindowWithScrollBars wwsb;
+printNameAndDisplay(wwsb); // 把派生类赋值给基类，造成切割问题，将调用基类的 display 函数
+```
+
+对于内置类型、STL的迭代器和函数对象， pass-by-value 往往比较适当。
