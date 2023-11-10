@@ -468,3 +468,60 @@ printNameAndDisplay(wwsb); // 把派生类赋值给基类，造成切割问题�
 ```
 
 对于内置类型、STL的迭代器和函数对象， pass-by-value 往往比较适当。
+
+## 条款21: 必须返回对象时，别妄想返回其 reference
+
+绝不要返回 pointer 或 reference 指向一个 local stack 对象，或返回 reference 指向一个 heap-allocated 对象，或返回 pointer 或 reference 指向一个 local staic 对象，而有可能同时需要多个这样的对象。
+
+```cpp
+int& foo() {
+    static int value = 0;
+    ++value;
+    return value;
+}
+
+int main() {
+    assert(foo() == foo()); // 返回的是引用自同一个static对象，断言一直成立
+
+    return 0;
+}
+```
+
+按值返回局部对象本身可以进行返回值优化 (return value optimization, RVO):
+
+```cpp
+class App {
+public:
+    App() {
+        std::cout << "default constructor" << std::endl;
+    }
+
+    App(const App&) {
+        std::cout << "copy constructor" << std::endl;
+    }
+
+    App(App&&) {
+        std::cout << "move constructor" << std::endl;
+    }
+};
+
+App func() {
+    return App{};
+}
+
+int main() {
+    App app = func();
+
+    return 0;
+}
+
+// 输出:
+// default constructor
+// 只调用了一次构造函数！
+```
+
+## 条款22: 将成员变量声明为 private
+
+将成员变量声明为 private，可赋予客户访问数据的一致性，可细微划分访问控制（如用函数实现只读、只写等）。
+
+protected 并不比 public 更具备封装性。

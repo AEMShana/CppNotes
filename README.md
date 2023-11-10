@@ -31,6 +31,9 @@ n 本 C++ 书籍的读书笔记。
 - [条款18: 让接口容易被正确使用，不易被误用](EffectiveCpp/EffectiveCpp.md)
 - [条款19: 设计 class 犹如设计 type](EffectiveCpp/EffectiveCpp.md)
 - [条款20: 宁以 pass-by-reference-to-const 替换 pass-by-value](EffectiveCpp/EffectiveCpp.md) 
+- [条款21: 必须返回对象时，别妄想返回其 reference](EffectiveCpp/EffectiveCpp.md) 
+- [条款22: 将成员变量声明为 private](EffectiveCpp/EffectiveCpp.md) 
+
 
 ## More Effective C++ (待读)
 
