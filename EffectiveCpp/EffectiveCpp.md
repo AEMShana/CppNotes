@@ -525,3 +525,76 @@ int main() {
 将成员变量声明为 private，可赋予客户访问数据的一致性，可细微划分访问控制（如用函数实现只读、只写等）。
 
 protected 并不比 public 更具备封装性。
+
+## 条款23: 宁以 non-member, non-friend 替换 member 函数
+
+对于为某个类提供便利的函数，让它成为 non-member、non-friend 函数比让它成为该类的 member 函数更具封装性、可扩展性。
+
+```cpp
+namespace WebBrowserStuff {
+    class WebBrowser {
+    public:
+        void clearCache();
+        void clearHistory();
+        void removeCookies();
+        // void clearBrowser(); 不适合作为 member function
+    };
+
+    void clearBrowser(WebBrowser& wb) {
+        wb.clearCache();
+        wb.clearHistory();
+        wb.removeCookies();
+    }
+}
+```
+
+## 条款24: 若所有参数皆需类型转换，请为此采用 non-member 函数
+
+如果所有参数皆需类型转换，请为此采用 non-member 函数。
+
+只有当参数被列于 parameter list 内，这个参数才是隐式转换的合格参与者：
+```cpp
+class Rational {
+public:
+    Rational(int numerator = 0, int denominator = 1);
+    const Rational operator*(const Rational& rhs) const;
+    int numerator() const;
+    int denominator() const;
+private:
+    ...
+};
+
+int main() {
+    Rational oneEight{ 1, 8 };
+    auto result = oneEight * 2;   // OK
+    result = 2 * oneEight;        // ERROR
+
+    return 0;
+}
+```
+
+使用 non-member 函数即可解决这个问题：
+```cpp
+class Rational {
+public:
+    Rational(int numerator = 0, int denominator = 1);
+    int numerator() const;
+    int denominator() const;
+private:
+    ...
+};
+
+const Rational operator*(const Rational& lhs, const Rational& rhs) {
+    return Rational(lhs.numerator() * lhs.numerator(), rhs.denominator() * rhs.denominator());
+}
+
+int main() {
+    Rational oneEight{ 1, 8 };
+    auto result = oneEight * 2;   // OK
+    result = 2 * oneEight;          // ERROR
+
+    return 0;
+}
+```
+
+上面的例子中 `operator*` 只访问了 `Rational` 的公有部分，所以没有必要是 `Rational` 的 friend。如果可以避免 friend 函数，就应该避免，不能够只因函数不该成为 member，就自动让它成为 friend。

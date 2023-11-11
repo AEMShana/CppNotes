@@ -10,7 +10,7 @@ n 本 C++ 书籍的读书笔记。
 
 ## Modern Effective C++ (已读完，待施工)
 
-## Effective C++ (施工中[20/55])
+## Effective C++ (施工中[24/55])
 - [条款01: 视C++为一个语言联邦](EffectiveCpp/EffectiveCpp.md)
 - [条款02: 尽量以 const, enum, inline 替换 #define](EffectiveCpp/EffectiveCpp.md)
 - [条款03: 尽可能使用 const](EffectiveCpp/EffectiveCpp.md)
@@ -33,7 +33,8 @@ n 本 C++ 书籍的读书笔记。
 - [条款20: 宁以 pass-by-reference-to-const 替换 pass-by-value](EffectiveCpp/EffectiveCpp.md) 
 - [条款21: 必须返回对象时，别妄想返回其 reference](EffectiveCpp/EffectiveCpp.md) 
 - [条款22: 将成员变量声明为 private](EffectiveCpp/EffectiveCpp.md) 
-
+- [条款23: 宁以 non-member, non-friend 替换 member 函数](EffectiveCpp/EffectiveCpp.md) 
+- [条款24: 若所有参数皆需类型转换，请为此采用 non-member 函数](EffectiveCpp/EffectiveCpp.md) 
 
 ## More Effective C++ (待读)
 
